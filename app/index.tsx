@@ -3,13 +3,14 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { TEXT_COLOR, styles } from "./styles";
 import Icon from '@expo/vector-icons/Entypo';
 import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler";
-import Animated, { Extrapolation, interpolate, interpolateColor, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import Animated, { Extrapolation, interpolate, interpolateColor, runOnJS, useAnimatedStyle, useDerivedValue, useSharedValue, withTiming } from "react-native-reanimated";
 import { useState } from "react";
+import { Canvas, Line, Path, Rect } from "@shopify/react-native-skia";
 
 const MIN = 0;
-const MAX = 150;
+const MAX = 80;
 
-const TRANS = 10;
+const TRANS = 100;
 
 function Card() {
 
@@ -56,12 +57,42 @@ function Card() {
 
   }));
 
+  const line = useDerivedValue(() => {
+    return interpolate(xOffset.value, [-TRANS, TRANS * -0.2, 0, TRANS * 0.2, TRANS], [1,0, 0, 0, 1], Extrapolation.CLAMP)
+  });
+
   return (
     <GestureDetector gesture={pan}>
       <Animated.View style={backgroundAss}>
         <View style={styles.cardBackground}>
+          {/*
           <Icon name="cross" size={28} color="white" />
+          */}
+          {/*
           <Icon name="check" size={28} color="white" />
+          */}
+          <Canvas style={{width: 24, height: 24}}>
+            <Path
+              path="M20 20 4 4m16 0L4 20"
+              strokeWidth={4}
+              style="stroke"
+              start={0}
+              end={line}
+              color="white"
+            />
+          </Canvas>
+          <Canvas
+            style={{ width: 24, height: 24 }}
+          >
+            <Path
+              path="m4 12 6 6L20 6"
+              strokeWidth={4}
+              style="stroke"
+              color="white"
+              start={0}
+              end={line}
+            />
+          </Canvas>
         </View>
         <Animated.View style={[styles.card, cardAss]}>
           <Text style={styles.text}>Card {counter}</Text>
